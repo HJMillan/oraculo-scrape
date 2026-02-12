@@ -1,34 +1,40 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Share2, RefreshCw, Loader2, Sparkles, Trophy } from 'lucide-react';
+import { RefreshCw, Loader2, Sparkles, Copy, MessageCircle, BarChart3 } from 'lucide-react';
 
-interface LotteryResult {
+interface LotteryItem {
     name: string;
     value: string;
 }
 
+interface LotterySection {
+    title: string;
+    date: string;
+    items: LotteryItem[];
+}
+
 interface ScrapingResponse {
     success: boolean;
-    data: LotteryResult[];
+    data: LotterySection[];
     lastUpdated: string;
     error?: string;
 }
 
 export function LotteryScraper() {
-    const [results, setResults] = useState<LotteryResult[]>([]);
+    const [sections, setSections] = useState<LotterySection[]>([]);
     const [loading, setLoading] = useState(false);
     const [lastUpdated, setLastUpdated] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const savedResults = localStorage.getItem('oraculo_results');
+        const savedSections = localStorage.getItem('oraculo_sections');
         const savedDate = localStorage.getItem('oraculo_date');
 
-        if (savedResults) {
+        if (savedSections) {
             try {
-                setResults(JSON.parse(savedResults));
+                setSections(JSON.parse(savedSections));
             } catch (e) {
-                console.error('Error parsing stored results', e);
+                console.error('Error parsing stored sections', e);
             }
         }
         if (savedDate) {
@@ -43,8 +49,8 @@ export function LotteryScraper() {
             const response = await axios.get<ScrapingResponse>('/api/scrape');
 
             if (response.data.success) {
-                const newResults = response.data.data;
-                setResults(newResults);
+                const newSections = response.data.data;
+                setSections(newSections);
 
                 const now = new Date().toLocaleString('es-ES', {
                     day: '2-digit', month: '2-digit', year: 'numeric',
@@ -52,7 +58,7 @@ export function LotteryScraper() {
                 });
                 setLastUpdated(now);
 
-                localStorage.setItem('oraculo_results', JSON.stringify(newResults));
+                localStorage.setItem('oraculo_sections', JSON.stringify(newSections));
                 localStorage.setItem('oraculo_date', now);
             } else {
                 throw new Error(response.data.error || 'Error desconocido');
@@ -65,131 +71,149 @@ export function LotteryScraper() {
         }
     };
 
-    const handleShare = async () => {
-        if (results.length === 0) return;
-
-        let shareText = `*🔮 Resultados Oráculo* - ${lastUpdated || 'Hoy'}\n\n`;
-
-        results.forEach((item) => {
-            // Formato: 📍 PROVINCIA: *1234*
-            shareText += `📍 ${item.name}: *${item.value}*\n`;
+    const generateSectionText = (section: LotterySection) => {
+        let text = `*${section.title}*\n📅 ${section.date || lastUpdated || 'Hoy'}\n\n`;
+        section.items.forEach(item => {
+            text += `${item.name}: ${item.value}\n`;
         });
+        return text;
+    }
 
-        shareText += `\n🍀 ¡Mucha suerte!`;
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Resultados Oráculo',
-                    text: shareText,
-                });
-            } catch (err) {
-                console.log('Error al compartir:', err);
-            }
-        } else {
-            try {
-                await navigator.clipboard.writeText(shareText);
-                alert('¡Resultados copiados al portapapeles!');
-            } catch (err) {
-                alert('No se pudo copiar automáticamente.');
-            }
+    const handleCopy = async (section: LotterySection) => {
+        const text = generateSectionText(section);
+        try {
+            await navigator.clipboard.writeText(text);
+            alert(`Copiado: ${section.title}`);
+        } catch (err) {
+            alert('Error al copiar');
         }
     };
 
-    // Helper para asignar colores según el nombre (opcional para dar variedad)
-    const getGradient = (index: number) => {
-        const gradients = [
-            'from-purple-500/10 to-transparent',
-            'from-blue-500/10 to-transparent',
-            'from-pink-500/10 to-transparent',
-            'from-indigo-500/10 to-transparent'
-        ];
-        return gradients[index % gradients.length];
+    const handleWhatsApp = (section: LotterySection) => {
+        const text = generateSectionText(section);
+        const encodedText = encodeURIComponent(text);
+        const url = `https://wa.me/5491125329923?text=${encodedText}`;
+        window.open(url, '_blank');
     };
 
     return (
-        <div className="w-full max-w-4xl flex flex-col items-center gap-8">
+        <div className="w-full flex flex-col gap-6">
 
-            {/* Panel de Control */}
-            <div className="flex flex-col items-center gap-4 w-full">
-                <button
-                    onClick={fetchNumbers}
-                    disabled={loading}
-                    className="group relative inline-flex items-center justify-center px-8 py-3 w-full sm:w-auto overflow-hidden font-bold text-white uppercase rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-wait"
-                >
-                    <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"></span>
+            {/* HEADER Horizontal */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full pb-4 border-b border-white/5 gap-4">
 
-                    {loading ? (
-                        <>
-                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                            Consultando Oráculo...
-                        </>
-                    ) : (
-                        <>
-                            <RefreshCw className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
-                            Actualizar Números
-                        </>
-                    )}
-                </button>
-
-                {lastUpdated && !loading && (
-                    <p className="text-xs font-semibold text-gray-400 tracking-wider">
-                        ÚLTIMA LECTURA: <span className="text-purple-300">{lastUpdated}</span>
-                    </p>
-                )}
-
-                {error && (
-                    <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-200 rounded-lg text-sm text-center animate-in fade-in slide-in-from-top-2">
-                        {error}
+                {/* IZQUIERDA: Logo / Título */}
+                <div className="flex items-center gap-3">
+                    <div className="p-3 bg-gradient-to-br from-pink-500/20 to-purple-600/20 rounded-xl border border-pink-500/20">
+                        <BarChart3 className="w-8 h-8 text-pink-500" />
                     </div>
-                )}
+                    <div>
+                        <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 tracking-tighter drop-shadow-sm leading-none">
+                            ORÁCULO
+                        </h1>
+                        <p className="text-gray-400 text-[10px] tracking-[0.3em] font-medium uppercase mt-1">
+                            Lotería & Quiniela
+                        </p>
+                    </div>
+                </div>
+
+                {/* DERECHA: Acciones */}
+                <div className="flex flex-col items-end gap-1 self-end md:self-auto">
+                    <button
+                        onClick={fetchNumbers}
+                        disabled={loading}
+                        className="group relative inline-flex items-center justify-center px-6 py-2 overflow-hidden font-bold text-white uppercase rounded-lg bg-pink-600 hover:bg-pink-500 shadow-md transition-all active:scale-95 disabled:opacity-70 disabled:cursor-wait text-sm tracking-widest"
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Actualizando
+                            </>
+                        ) : (
+                            <>
+                                <RefreshCw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
+                                Actualizar
+                            </>
+                        )}
+                    </button>
+
+                    {lastUpdated && !loading && (
+                        <p className="text-[10px] font-semibold text-gray-500 tracking-wider uppercase">
+                            Última: <span className="text-pink-400">{lastUpdated}</span>
+                        </p>
+                    )}
+                </div>
             </div>
 
-            {/* Grid de Resultados */}
-            {results.length > 0 ? (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full animate-in fade-in zoom-in duration-500">
-                    {results.map((item, idx) => (
-                        <div
-                            key={`${item.name}-${idx}`}
-                            className="relative group bg-gray-800/40 backdrop-blur-md border border-white/5 p-4 rounded-2xl flex flex-col items-center justify-center shadow-xl transition-all duration-300 hover:border-purple-500/30 hover:bg-gray-800/60 hover:-translate-y-1 overflow-hidden"
-                        >
-                            <div className={`absolute inset-0 bg-gradient-to-tr ${getGradient(idx)} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+            {error && (
+                <div className="p-2 bg-red-500/10 border border-red-500/20 text-red-200 rounded text-xs text-center animate-in fade-in slide-in-from-top-2 w-full">
+                    {error}
+                </div>
+            )}
 
-                            <div className="flex items-center gap-2 mb-2 w-full justify-center border-b border-white/5 pb-2">
-                                <Trophy className="w-3 h-3 text-yellow-500/50" />
-                                <span className="text-xs font-bold tracking-widest text-gray-400 uppercase truncate max-w-[80%] text-center">
-                                    {item.name}
-                                </span>
+            {/* Listado de Tablas - Grid Full Width (max-w-7xl controlled by container) */}
+            {sections.length > 0 ? (
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-start animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {sections.map((section, idx) => (
+                        <div key={idx} className="w-full rounded-xl overflow-hidden shadow-xl shadow-black/20 flex flex-col h-full bg-[#1a1b26] border border-white/5 group hover:border-pink-500/30 transition-colors duration-300">
+                            {/* Header Tabla */}
+                            <div className="bg-[#242636] p-3 text-center relative border-b border-white/5 shrink-0 group-hover:bg-[#2a2d40] transition-colors">
+                                <h3 className="text-pink-500 font-black text-base uppercase tracking-wider">
+                                    {section.title}
+                                </h3>
+                                {/* DATE DISPLAY */}
+                                <p className="text-gray-400 text-[10px] font-bold tracking-widest mt-0.5">
+                                    {section.date || '-'}
+                                </p>
                             </div>
 
-                            <span className="text-3xl sm:text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 group-hover:from-purple-200 group-hover:to-white transition-all">
-                                {item.value}
-                            </span>
+                            {/* Cuerpo Tabla */}
+                            <div className="bg-[#fffffa] p-2 flex flex-col gap-1 grow">
+                                {section.items.map((item, itemIdx) => (
+                                    <div
+                                        key={itemIdx}
+                                        className="flex items-center justify-between bg-white rounded border border-gray-100 py-1 px-2 shadow-sm"
+                                    >
+                                        <span className="text-pink-600 font-bold text-[10px] sm:text-xs uppercase tracking-wider truncate">
+                                            {item.name}
+                                        </span>
+                                        <span className="text-xl font-black text-gray-800 tracking-tighter tabular-nums">
+                                            {item.value}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
 
-                            <Sparkles className="absolute top-2 right-2 w-3 h-3 text-yellow-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse" />
+                            {/* Acciones Footer */}
+                            <div className="bg-[#1f212e] p-2 flex gap-2 border-t border-white/5 shrink-0">
+                                <button
+                                    onClick={() => handleCopy(section)}
+                                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-wide"
+                                    title="Copiar texto"
+                                >
+                                    <Copy className="w-3 h-3" />
+                                    Copiar
+                                </button>
+                                <button
+                                    onClick={() => handleWhatsApp(section)}
+                                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-green-500/10 hover:bg-green-500/20 text-green-500 hover:text-green-400 transition-colors text-[10px] font-bold uppercase tracking-wide border border-green-500/10"
+                                    title="WhatsApp"
+                                >
+                                    <MessageCircle className="w-3 h-3" />
+                                    Enviar
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
             ) : (
                 !loading && (
-                    <div className="flex flex-col items-center justify-center p-10 border-2 border-dashed border-gray-700 rounded-2xl text-gray-500">
-                        <Sparkles className="w-10 h-10 mb-4 text-gray-600" />
-                        <p>El oráculo espera tu consulta.</p>
+                    <div className="flex flex-col items-center justify-center p-10 border-2 border-dashed border-gray-800 rounded-xl text-gray-600 w-full">
+                        <Sparkles className="w-8 h-8 mb-3 opacity-50" />
+                        <p className="text-sm">Sin datos</p>
                     </div>
                 )
             )}
-
-            {/* Compartir */}
-            <div className="mt-4 pb-8 w-full flex justify-center border-t border-white/5 pt-8">
-                <button
-                    onClick={handleShare}
-                    disabled={results.length === 0}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-green-500/20 bg-green-500/5 text-green-400 hover:bg-green-500/10 hover:border-green-500/40 hover:text-green-300 transition-all disabled:opacity-30 disabled:hover:bg-transparent font-medium tracking-wide uppercase text-sm shadow-lg shadow-green-900/10"
-                >
-                    <Share2 className="w-4 h-4" />
-                    Compartir en WhatsApp
-                </button>
-            </div>
 
         </div>
     );
