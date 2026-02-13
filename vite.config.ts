@@ -8,6 +8,17 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    build: {
+        target: 'es2020',
+        cssCodeSplit: false,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom'],
+                },
+            },
+        },
+    },
     server: {
         proxy: {
             '/api': {

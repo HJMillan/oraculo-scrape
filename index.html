@@ -1,13 +1,51 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Oráculo Scraping</title>
-  </head>
-  <body class="bg-gray-900 text-white antialiased">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="theme-color" content="#0a0b14" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <!-- SEO Básico -->
+  <title>Oráculo — Resultados de Lotería y Quiniela en Tiempo Real</title>
+  <meta name="description"
+    content="Consultá los resultados actualizados de la Lotería Nacional, Provincia, Quiniela y más. Datos extraídos del Oráculo Semanal." />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Oráculo — Resultados de Lotería y Quiniela" />
+  <meta property="og:description"
+    content="Resultados actualizados del Oráculo Semanal: La Previa, Las Primeras, Matutina, Vespertina y Nocturna." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_AR" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Oráculo — Resultados de Lotería y Quiniela" />
+  <meta name="twitter:description" content="Resultados actualizados del Oráculo Semanal." />
+</head>
+
+<body class="bg-gray-900 text-white antialiased" style="margin:0;background:#0a0b14;color:#fff;min-height:100vh">
+  <div id="root">
+    <!-- Loading skeleton: se pinta antes de que React cargue -->
+    <div
+      style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif">
+      <div
+        style="width:2rem;height:2rem;border:3px solid #ec4899;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite">
+      </div>
+      <p style="margin-top:1rem;color:#9ca3af;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase">Cargando
+        resultados…</p>
+    </div>
+    <style>
+      @keyframes spin {
+        to {
+          transform: rotate(360deg)
+        }
+      }
+    </style>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
