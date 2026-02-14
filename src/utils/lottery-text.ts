@@ -20,7 +20,8 @@ export function generateSectionText(
         const key = `${section.title}::${item.name}`;
         const status = statusMap[key];
         const statusLabel = status ? ` *${STATUS_LABELS[status]}*` : '';
-        text += `${item.name}: ${item.value}${statusLabel}\n`;
+        const displayName = item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase();
+        text += `${displayName} → ${item.value}${statusLabel}\n`;
     });
 
     return text;
