@@ -26,7 +26,7 @@ export async function fetchAndParseCanvaData(
     targetUrl: string,
     options?: FetchOptions,
 ): Promise<{ data: CanvaBootstrapData; rawJson: string }> {
-    const { timeoutMs = 15_000, retries = 2 } = options ?? {};
+    const { timeoutMs = 10_000, retries = 1 } = options ?? {};
 
     let lastError: Error = new Error('Fetch failed');
 

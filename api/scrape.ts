@@ -6,10 +6,11 @@ export default async function handler(_request: VercelRequest, response: VercelR
         const result = await scrapeOracle();
         return response.status(200).json(result);
     } catch (error) {
-        console.error('Scraping error:', error);
+        const message = error instanceof Error ? error.message : String(error);
+        console.error('Scraping error:', message, error);
         return response.status(500).json({
             success: false,
-            error: 'Error al procesar datos del Oráculo',
+            error: `Error al procesar datos del Oráculo: ${message}`,
         });
     }
 }
