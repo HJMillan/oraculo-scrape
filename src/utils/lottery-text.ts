@@ -8,6 +8,14 @@ const STATUS_LABELS: Record<NonNullable<ItemStatus>, string> = {
     perla: 'la Perla',
 };
 
+/** Hour labels appended to each section (except NOCTURNA) */
+const SECTION_HOURS: Record<string, string> = {
+    'LA PREVIA': '10hs',
+    'LAS PRIMERAS': '12hs',
+    'MATUTINA': '15hs',
+    'VESPERTINA': '18hs',
+};
+
 export function generateSectionText(
     section: LotterySection,
     lastUpdated: string | null,
@@ -23,6 +31,11 @@ export function generateSectionText(
         const displayName = item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase();
         text += `${displayName} → ${item.value}${statusLabel}\n`;
     });
+
+    const hour = SECTION_HOURS[section.title];
+    if (hour) {
+        text += `\n*AGREGUE ${hour}*\n`;
+    }
 
     return text;
 }
