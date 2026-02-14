@@ -1,5 +1,28 @@
-// ─── Re-export shared types ───
-export type { LotteryItem, LotterySection, ScrapingResponse } from '../../shared/types';
+// ─── Shared types (inlined for Vercel serverless bundling compatibility) ───
+// Keep in sync with ../../shared/types.ts — Vercel cannot resolve imports
+// that exit the api/ directory.
+
+export interface LotteryItem {
+    name: string;
+    value: string;
+    gifUrl?: string;
+}
+
+export interface LotterySection {
+    title: string;
+    date: string;
+    items: LotteryItem[];
+}
+
+export interface ScrapingResponse {
+    success: boolean;
+    data: LotterySection[];
+    lastUpdated: string;
+    error?: string;
+    warning?: string;
+}
+
+export type ItemStatus = 'dateli' | 'dataudio' | 'perla' | null;
 
 // ─── Canva bootstrap data structures (backend only) ───
 
