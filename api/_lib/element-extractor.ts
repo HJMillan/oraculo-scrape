@@ -1,4 +1,4 @@
-import type { CanvaPage, ScrapedItem, GifElement, LotteryItem, LotterySection } from './types';
+import type { CanvaPage, ScrapedItem, GifElement, LotteryItem, LotterySection } from './types.js';
 
 // ─── Constants ───
 

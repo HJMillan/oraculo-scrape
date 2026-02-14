@@ -1,4 +1,4 @@
-import type { CanvaBootstrapData } from './types';
+import type { CanvaBootstrapData } from './types.js';
 
 /** Known GIF hashes from the Oráculo → plain text label for copy/share */
 export const KNOWN_GIF_HASHES: Record<string, string> = {

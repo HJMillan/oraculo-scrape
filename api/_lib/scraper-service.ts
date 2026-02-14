@@ -1,7 +1,7 @@
-import type { ScrapingResponse } from './types';
-import { fetchAndParseCanvaData, validateAndExtractPages } from './canva-parser';
-import { buildGifAssetMap } from './gif-asset-mapper';
-import { extractSectionsFromPages } from './element-extractor';
+import type { ScrapingResponse } from './types.js';
+import { fetchAndParseCanvaData, validateAndExtractPages } from './canva-parser.js';
+import { buildGifAssetMap } from './gif-asset-mapper.js';
+import { extractSectionsFromPages } from './element-extractor.js';
 
 const TARGET_URL = 'https://pob.my.canva.site/oraculo';
 

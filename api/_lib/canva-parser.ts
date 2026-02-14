@@ -1,4 +1,4 @@
-import type { CanvaBootstrapData } from './types';
+import type { CanvaBootstrapData } from './types.js';
 
 /**
  * Multiple regex patterns for the Canva bootstrap payload.

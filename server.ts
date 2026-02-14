@@ -1,5 +1,5 @@
 import express from 'express';
-import { scrapeOracle } from './api/lib/scraper-service';
+import { scrapeOracle } from './api/_lib/scraper-service.js';
 
 // Servidor Express para desarrollo local
 const app = express();
