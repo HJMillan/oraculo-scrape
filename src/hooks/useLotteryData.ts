@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
+export type ItemStatus = 'dateli' | 'dataudio' | 'perla' | null;
+
 export interface LotteryItem {
     name: string;
     value: string;

@@ -1,19 +1,37 @@
-import type { LotterySection } from '../hooks/useLotteryData';
-import { getGifTextLabel } from './gif-map';
+import type { LotterySection, ItemStatus } from '../hooks/useLotteryData';
 
-export function generateSectionText(section: LotterySection, lastUpdated: string | null): string {
+/** Maps status values to the display text used in copy/WhatsApp */
+const STATUS_LABELS: Record<NonNullable<ItemStatus>, string> = {
+    dateli: 'Dato de datelli',
+    dataudio: 'Dataudio',
+    perla: 'la Perla',
+};
+
+export function generateSectionText(
+    section: LotterySection,
+    lastUpdated: string | null,
+    statusMap: Record<string, ItemStatus>,
+): string {
     const textTitle = `RESULTADOS DE LAS ${section.title}`;
     let text = `*${textTitle}*\n${section.date || lastUpdated || 'Hoy'}\n\n`;
+
     section.items.forEach(item => {
-        const gifLabel = item.gifUrl ? ` *${getGifTextLabel(item.gifUrl)}*` : '';
-        text += `${item.name}: ${item.value}${gifLabel}\n`;
+        const key = `${section.title}::${item.name}`;
+        const status = statusMap[key];
+        const statusLabel = status ? ` *${STATUS_LABELS[status]}*` : '';
+        text += `${item.name}: ${item.value}${statusLabel}\n`;
     });
+
     return text;
 }
 
 const WA_NUMBER = '5491125329923';
 
-export function getWhatsAppUrl(section: LotterySection, lastUpdated: string | null): string {
-    const text = generateSectionText(section, lastUpdated);
+export function getWhatsAppUrl(
+    section: LotterySection,
+    lastUpdated: string | null,
+    statusMap: Record<string, ItemStatus>,
+): string {
+    const text = generateSectionText(section, lastUpdated, statusMap);
     return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 }

@@ -1,13 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
 import Check from 'lucide-react/dist/esm/icons/check';
 import { useLotteryData } from '../hooks/useLotteryData';
+import type { ItemStatus } from '../hooks/useLotteryData';
 import { LotteryHeader } from './LotteryHeader';
 import { LotteryCard } from './LotteryCard';
 import { EmptyState } from './EmptyState';
 
+const STATUS_STORAGE_KEY = 'oraculo_statuses';
+
 export function LotteryScraper() {
     const { sections, loading, error, lastUpdated, refresh } = useLotteryData();
     const [toast, setToast] = useState<string | null>(null);
+
+    // Status map: itemKey → ItemStatus, persisted to localStorage
+    const [statusMap, setStatusMap] = useState<Record<string, ItemStatus>>(() => {
+        try {
+            const saved = localStorage.getItem(STATUS_STORAGE_KEY);
+            return saved ? JSON.parse(saved) : {};
+        } catch {
+            return {};
+        }
+    });
+
+    // Persist status changes
+    useEffect(() => {
+        localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(statusMap));
+    }, [statusMap]);
 
     // Auto-dismiss toast after 2 seconds
     useEffect(() => {
@@ -18,6 +36,18 @@ export function LotteryScraper() {
 
     const handleToast = useCallback((message: string) => {
         setToast(message);
+    }, []);
+
+    const handleStatusChange = useCallback((itemKey: string, status: ItemStatus) => {
+        setStatusMap(prev => {
+            const next = { ...prev };
+            if (status === null) {
+                delete next[itemKey];
+            } else {
+                next[itemKey] = status;
+            }
+            return next;
+        });
     }, []);
 
     return (
@@ -58,6 +88,8 @@ export function LotteryScraper() {
                             key={`${section.title}-${section.date}`}
                             section={section}
                             lastUpdated={lastUpdated}
+                            statusMap={statusMap}
+                            onStatusChange={handleStatusChange}
                             onToast={handleToast}
                         />
                     ))}

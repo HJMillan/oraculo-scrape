@@ -42,3 +42,27 @@ declare module 'lucide-react/dist/esm/icons/sparkles' {
     const Sparkles: LucideIcon;
     export default Sparkles;
 }
+
+declare module 'lucide-react/dist/esm/icons/info' {
+    import type { LucideIcon } from 'lucide-react';
+    const Info: LucideIcon;
+    export default Info;
+}
+
+declare module 'lucide-react/dist/esm/icons/volume-2' {
+    import type { LucideIcon } from 'lucide-react';
+    const Volume2: LucideIcon;
+    export default Volume2;
+}
+
+declare module 'lucide-react/dist/esm/icons/gem' {
+    import type { LucideIcon } from 'lucide-react';
+    const Gem: LucideIcon;
+    export default Gem;
+}
+
+declare module 'lucide-react/dist/esm/icons/circle-slash' {
+    import type { LucideIcon } from 'lucide-react';
+    const CircleSlash: LucideIcon;
+    export default CircleSlash;
+}

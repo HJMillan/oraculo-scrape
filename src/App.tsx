@@ -4,7 +4,7 @@ function App() {
     return (
         <div className="min-h-screen bg-surface-base text-white grid grid-rows-[1fr_auto] w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
             <main className="w-full flex flex-col items-center p-4">
-                <div className="w-full max-w-7xl">
+                <div className="w-full">
                     <LotteryScraper />
                 </div>
             </main>

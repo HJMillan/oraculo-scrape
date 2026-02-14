@@ -1,30 +1,37 @@
 import { useCallback } from 'react';
 import Copy from 'lucide-react/dist/esm/icons/copy';
 import MessageCircle from 'lucide-react/dist/esm/icons/message-circle';
-import type { LotterySection } from '../hooks/useLotteryData';
+import type { LotterySection, ItemStatus } from '../hooks/useLotteryData';
 import { generateSectionText, getWhatsAppUrl } from '../utils/lottery-text';
-import { getGifTextLabel } from '../utils/gif-map';
+import { StatusToggle } from './StatusToggle';
 
 interface LotteryCardProps {
     section: LotterySection;
     lastUpdated: string | null;
+    statusMap: Record<string, ItemStatus>;
+    onStatusChange: (itemKey: string, status: ItemStatus) => void;
     onToast: (message: string) => void;
 }
 
-export function LotteryCard({ section, lastUpdated, onToast }: LotteryCardProps) {
+/** Generates a unique key for an item within its section */
+function itemKey(sectionTitle: string, itemName: string): string {
+    return `${sectionTitle}::${itemName}`;
+}
+
+export function LotteryCard({ section, lastUpdated, statusMap, onStatusChange, onToast }: LotteryCardProps) {
     const handleCopy = useCallback(async () => {
-        const text = generateSectionText(section, lastUpdated);
+        const text = generateSectionText(section, lastUpdated, statusMap);
         try {
             await navigator.clipboard.writeText(text);
             onToast(`✓ Copiado: ${section.title}`);
         } catch {
             onToast('Error al copiar');
         }
-    }, [section, lastUpdated, onToast]);
+    }, [section, lastUpdated, statusMap, onToast]);
 
     const handleWhatsApp = useCallback(() => {
-        window.open(getWhatsAppUrl(section, lastUpdated), '_blank');
-    }, [section, lastUpdated]);
+        window.open(getWhatsAppUrl(section, lastUpdated, statusMap), '_blank');
+    }, [section, lastUpdated, statusMap]);
 
     return (
         <article
@@ -44,31 +51,31 @@ export function LotteryCard({ section, lastUpdated, onToast }: LotteryCardProps)
 
             {/* Body — Semantic definition list */}
             <dl className="bg-surface-card-body p-2 flex flex-col gap-1 grow">
-                {section.items.map((item) => (
-                    <div
-                        key={`${item.name}-${item.value}`}
-                        className="flex items-center bg-white rounded border border-gray-100 py-1 px-2 shadow-sm"
-                    >
-                        <dt className="text-pink-600 font-bold text-[10px] sm:text-xs uppercase tracking-wider truncate flex-shrink-0">
-                            {item.name}
-                        </dt>
-                        <dd className="m-0 flex-1 text-right">
-                            <span className="text-xl font-black text-gray-800 tracking-tighter tabular-nums">
-                                {item.value}
-                            </span>
-                        </dd>
-                        <div className="w-12 flex-shrink-0 relative">
-                            {item.gifUrl && (
-                                <img
-                                    src={item.gifUrl}
-                                    alt={getGifTextLabel(item.gifUrl)}
-                                    className={`absolute right-0 top-1/2 -translate-y-1/2 rounded-sm object-contain ${item.gifUrl.includes('8e0ebcbefac2c7ccb84860b646bf77dd') ? 'w-8 h-auto' : 'w-20 h-auto'}`}
-                                    loading="lazy"
-                                />
-                            )}
+                {section.items.map((item) => {
+                    const key = itemKey(section.title, item.name);
+                    return (
+                        <div
+                            key={`${item.name}-${item.value}`}
+                            className="grid grid-cols-[auto_1fr_auto] md:grid-cols-1 items-center bg-white rounded border border-gray-100 py-1 px-2 shadow-sm gap-x-2 gap-y-1"
+                        >
+                            {/* Name */}
+                            <dt className="text-pink-600 font-bold text-[10px] sm:text-xs uppercase tracking-wider truncate">
+                                {item.name}
+                            </dt>
+                            {/* Value */}
+                            <dd className="m-0 text-center">
+                                <span className="text-xl font-black text-gray-800 tracking-tighter tabular-nums">
+                                    {item.value}
+                                </span>
+                            </dd>
+                            {/* Toggle */}
+                            <StatusToggle
+                                value={statusMap[key] ?? null}
+                                onChange={(status) => onStatusChange(key, status)}
+                            />
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </dl>
 
             {/* Actions Footer */}

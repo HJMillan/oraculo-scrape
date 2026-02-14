@@ -104,7 +104,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
         const sections: LotterySection[] = [];
 
         // Define known categories in display order
-        const ORDERED_TITLES = ['LA PREVIA', 'LAS PRIMERAS', 'MATUTINA', 'VESPERTINA', 'NOCTURNA'];
+        const ORDERED_TITLES = ['NOCTURNA', 'LA PREVIA', 'LAS PRIMERAS', 'MATUTINA', 'VESPERTINA'];
 
         // Helper to normalize titles found in text
         const normalizeTitle = (text: string): string | null => {
