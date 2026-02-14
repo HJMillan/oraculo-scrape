@@ -1,7 +1,9 @@
-import axios from 'axios';
+// Debug utility: inspect raw text elements from page 0 of the Canva site.
+// Uses native fetch (no external dependencies).
 
 try {
-    const { data: html } = await axios.get('https://pob.my.canva.site/oraculo');
+    const res = await fetch('https://pob.my.canva.site/oraculo');
+    const html = await res.text();
 
     const bootstrapRegex = /window\['bootstrap'\]\s*=\s*JSON\.parse\('(.+?)'\);/;
     const match = html.match(bootstrapRegex);

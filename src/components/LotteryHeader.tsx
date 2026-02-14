@@ -32,12 +32,12 @@ export function LotteryHeader({ loading, lastUpdated, onRefresh }: LotteryHeader
                     onClick={onRefresh}
                     disabled={loading}
                     aria-label={loading ? 'Actualizando resultados' : 'Actualizar resultados de lotería'}
-                    className="group relative inline-flex items-center justify-center p-3 sm:px-6 sm:py-2 overflow-hidden font-bold text-white uppercase rounded-lg bg-pink-600 hover:bg-pink-500 shadow-md transition-all active:scale-95 disabled:opacity-70 disabled:cursor-wait text-sm tracking-widest focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base outline-none"
+                    className="group relative inline-flex items-center justify-center p-3 sm:px-6 sm:py-2 overflow-hidden font-bold text-white uppercase rounded-lg bg-pink-600 hover:bg-pink-500 shadow-md transition-all disabled:opacity-50 disabled:cursor-wait disabled:pointer-events-none text-sm tracking-widest focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base outline-none"
                 >
                     {loading ? (
                         <>
-                            <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 sm:mr-2 animate-spin" aria-hidden="true" />
-                            <span className="hidden sm:inline">Actualizando</span>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                            <span className="text-xs">Actualizando...</span>
                         </>
                     ) : (
                         <>

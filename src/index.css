@@ -6,7 +6,8 @@
   --color-surface-card-header: #242636;
   --color-surface-card-header-hover: #2a2d40;
   --color-surface-card-footer: #1f212e;
-  --color-surface-card-body: #fffffa;
+  --color-surface-card-body: #1e1f2e;
+  --color-surface-item: #282a3a;
 }
 
 :root {

@@ -1,6 +1,5 @@
 import express from 'express';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import handler from './api/scrape';
+import { scrapeOracle } from './api/lib/scraper-service';
 
 // Servidor Express para desarrollo local
 const app = express();
@@ -8,13 +7,13 @@ const port = 3000;
 
 app.use(express.json());
 
-// Adaptador simple para emular Vercel Request/Response en Express
-app.get('/api/scrape', async (req, res) => {
+app.get('/api/scrape', async (_req, res) => {
     try {
-        await handler(req as unknown as VercelRequest, res as unknown as VercelResponse);
+        const result = await scrapeOracle();
+        res.json(result);
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
 

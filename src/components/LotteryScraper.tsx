@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import Check from 'lucide-react/dist/esm/icons/check';
 import { useLotteryData } from '../hooks/useLotteryData';
-import type { ItemStatus } from '../hooks/useLotteryData';
+import type { ItemStatus } from '../types/lottery';
+import { cn } from '../utils/cn';
 import { LotteryHeader } from './LotteryHeader';
 import { LotteryCard } from './LotteryCard';
 import { EmptyState } from './EmptyState';
@@ -22,9 +23,12 @@ export function LotteryScraper() {
         }
     });
 
-    // Persist status changes
+    // Debounced persistence of status changes
     useEffect(() => {
-        localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(statusMap));
+        const timer = setTimeout(() => {
+            localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(statusMap));
+        }, 500);
+        return () => clearTimeout(timer);
     }, [statusMap]);
 
     // Auto-dismiss toast after 2 seconds
@@ -53,17 +57,21 @@ export function LotteryScraper() {
     return (
         <section aria-label="Resultados de lotería" className="w-full flex flex-col gap-6">
 
-            {/* Toast notification */}
-            {toast && (
-                <div
-                    role="status"
-                    aria-live="polite"
-                    className="fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-gray-800 border border-white/10 text-white rounded-lg shadow-xl text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-300"
-                >
-                    <Check className="w-4 h-4 text-green-400" aria-hidden="true" />
-                    {toast}
-                </div>
-            )}
+            {/* Toast notification — always rendered for screen reader accessibility */}
+            <div
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                className={cn(
+                    'fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-gray-800 border border-white/10 text-white rounded-lg shadow-xl text-sm font-medium transition-all duration-300',
+                    toast
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 -translate-y-2 pointer-events-none',
+                )}
+            >
+                <Check className="w-4 h-4 text-green-400" aria-hidden="true" />
+                {toast ?? ''}
+            </div>
 
             <LotteryHeader loading={loading} lastUpdated={lastUpdated} onRefresh={refresh} />
 
@@ -95,7 +103,7 @@ export function LotteryScraper() {
                     ))}
                 </div>
             ) : (
-                !loading && <EmptyState />
+                !loading && <EmptyState onRefresh={refresh} />
             )}
 
         </section>

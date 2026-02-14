@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import Copy from 'lucide-react/dist/esm/icons/copy';
 import MessageCircle from 'lucide-react/dist/esm/icons/message-circle';
-import type { LotterySection, ItemStatus } from '../hooks/useLotteryData';
+import type { LotterySection, ItemStatus } from '../types/lottery';
 import { generateSectionText, getWhatsAppUrl } from '../utils/lottery-text';
 import { StatusToggle } from './StatusToggle';
 
@@ -25,13 +25,21 @@ export function LotteryCard({ section, lastUpdated, statusMap, onStatusChange, o
             await navigator.clipboard.writeText(text);
             onToast(`✓ Copiado: ${section.title}`);
         } catch {
-            onToast('Error al copiar');
+            onToast('⚠ No se pudo copiar. Verifica los permisos del navegador.');
         }
     }, [section, lastUpdated, statusMap, onToast]);
 
     const handleWhatsApp = useCallback(() => {
-        window.open(getWhatsAppUrl(section, lastUpdated, statusMap), '_blank');
-    }, [section, lastUpdated, statusMap]);
+        try {
+            const url = getWhatsAppUrl(section, lastUpdated, statusMap);
+            const win = window.open(url, '_blank');
+            if (!win) {
+                onToast('⚠ Permite las ventanas emergentes para enviar por WhatsApp');
+            }
+        } catch {
+            onToast('⚠ Error al abrir WhatsApp');
+        }
+    }, [section, lastUpdated, statusMap, onToast]);
 
     return (
         <article
@@ -40,11 +48,11 @@ export function LotteryCard({ section, lastUpdated, statusMap, onStatusChange, o
             className="w-full rounded-xl overflow-hidden shadow-xl shadow-black/20 flex flex-col h-full min-h-[200px] bg-surface-card border border-white/5 group hover:border-pink-500/30 transition-colors duration-300"
         >
             {/* Header */}
-            <div className="bg-surface-card-header p-3 text-center relative border-b border-white/5 shrink-0 group-hover:bg-surface-card-header-hover transition-colors">
+            <div className="bg-surface-card-header py-1.5 px-3 text-center relative border-b border-white/5 shrink-0 group-hover:bg-surface-card-header-hover transition-colors flex flex-col md:flex-row md:justify-between md:items-center">
                 <h2 className="text-pink-500 font-black text-base uppercase tracking-wider">
                     {section.title}
                 </h2>
-                <p className="text-gray-300 text-[10px] font-bold tracking-widest mt-0.5">
+                <p className="text-gray-300 text-[10px] font-bold tracking-widest md:mt-0">
                     {section.date || '-'}
                 </p>
             </div>
@@ -56,15 +64,15 @@ export function LotteryCard({ section, lastUpdated, statusMap, onStatusChange, o
                     return (
                         <div
                             key={`${item.name}-${item.value}`}
-                            className="grid grid-cols-[auto_1fr_auto] md:grid-cols-[auto_1fr] items-center bg-white rounded border border-gray-100 py-1 px-2 shadow-sm gap-x-2 gap-y-1"
+                            className="grid grid-cols-[auto_1fr_auto] md:grid-cols-[auto_1fr] items-center bg-surface-item rounded border border-white/5 py-0.5 px-2 shadow-sm gap-x-2 gap-y-1"
                         >
                             {/* Name */}
-                            <dt className="text-pink-600 font-bold text-[10px] sm:text-xs uppercase tracking-wider truncate">
+                            <dt className="text-pink-400 font-bold text-[10px] sm:text-xs uppercase tracking-wider truncate">
                                 {item.name}
                             </dt>
                             {/* Value */}
                             <dd className="m-0 text-center md:text-right">
-                                <span className="text-xl font-black text-gray-800 tracking-tighter tabular-nums">
+                                <span className="text-xl font-black text-gray-100 tracking-tighter tabular-nums">
                                     {item.value}
                                 </span>
                             </dd>
@@ -85,7 +93,7 @@ export function LotteryCard({ section, lastUpdated, statusMap, onStatusChange, o
                 <button
                     onClick={handleCopy}
                     aria-label={`Copiar resultados de ${section.title}`}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded bg-white/5 hover:bg-white/10 active:scale-95 text-gray-300 hover:text-white transition-all text-[10px] font-bold uppercase tracking-wide focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-white/5 hover:bg-white/10 active:scale-95 text-gray-300 hover:text-white transition-all text-[10px] font-bold uppercase tracking-wide focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
                 >
                     <Copy className="w-3 h-3" aria-hidden="true" />
                     Copiar
@@ -93,7 +101,7 @@ export function LotteryCard({ section, lastUpdated, statusMap, onStatusChange, o
                 <button
                     onClick={handleWhatsApp}
                     aria-label={`Enviar resultados de ${section.title} por WhatsApp`}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded bg-green-500/10 hover:bg-green-500/20 active:scale-95 text-green-500 hover:text-green-400 transition-all text-[10px] font-bold uppercase tracking-wide border border-green-500/10 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-green-500/10 hover:bg-green-500/20 active:scale-95 text-green-500 hover:text-green-400 transition-all text-[10px] font-bold uppercase tracking-wide border border-green-500/10 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
                 >
                     <MessageCircle className="w-3 h-3" aria-hidden="true" />
                     Enviar

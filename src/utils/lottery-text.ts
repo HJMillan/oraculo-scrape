@@ -1,4 +1,5 @@
-import type { LotterySection, ItemStatus } from '../hooks/useLotteryData';
+import type { LotterySection, ItemStatus } from '../types/lottery';
+import { WA_NUMBER } from '../config';
 
 /** Maps status values to the display text used in copy/WhatsApp */
 const STATUS_LABELS: Record<NonNullable<ItemStatus>, string> = {
@@ -24,8 +25,6 @@ export function generateSectionText(
 
     return text;
 }
-
-const WA_NUMBER = '5491125329923';
 
 export function getWhatsAppUrl(
     section: LotterySection,
