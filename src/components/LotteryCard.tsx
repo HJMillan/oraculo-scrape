@@ -56,23 +56,25 @@ export function LotteryCard({ section, lastUpdated, statusMap, onStatusChange, o
                     return (
                         <div
                             key={`${item.name}-${item.value}`}
-                            className="grid grid-cols-[auto_1fr_auto] md:grid-cols-1 items-center bg-white rounded border border-gray-100 py-1 px-2 shadow-sm gap-x-2 gap-y-1"
+                            className="grid grid-cols-[auto_1fr_auto] md:grid-cols-[auto_1fr] items-center bg-white rounded border border-gray-100 py-1 px-2 shadow-sm gap-x-2 gap-y-1"
                         >
                             {/* Name */}
                             <dt className="text-pink-600 font-bold text-[10px] sm:text-xs uppercase tracking-wider truncate">
                                 {item.name}
                             </dt>
                             {/* Value */}
-                            <dd className="m-0 text-center">
+                            <dd className="m-0 text-center md:text-right">
                                 <span className="text-xl font-black text-gray-800 tracking-tighter tabular-nums">
                                     {item.value}
                                 </span>
                             </dd>
-                            {/* Toggle */}
-                            <StatusToggle
-                                value={statusMap[key] ?? null}
-                                onChange={(status) => onStatusChange(key, status)}
-                            />
+                            {/* Toggle — on desktop spans full row below */}
+                            <div className="md:col-span-2">
+                                <StatusToggle
+                                    value={statusMap[key] ?? null}
+                                    onChange={(status) => onStatusChange(key, status)}
+                                />
+                            </div>
                         </div>
                     );
                 })}
