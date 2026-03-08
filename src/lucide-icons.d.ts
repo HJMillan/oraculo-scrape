@@ -66,3 +66,21 @@ declare module 'lucide-react/dist/esm/icons/circle-slash' {
     const CircleSlash: LucideIcon;
     export default CircleSlash;
 }
+
+declare module 'lucide-react/dist/esm/icons/rotate-ccw' {
+    import type { LucideIcon } from 'lucide-react';
+    const RotateCcw: LucideIcon;
+    export default RotateCcw;
+}
+
+declare module 'lucide-react/dist/esm/icons/alert-triangle' {
+    import type { LucideIcon } from 'lucide-react';
+    const AlertTriangle: LucideIcon;
+    export default AlertTriangle;
+}
+
+declare module 'lucide-react/dist/esm/icons/x-circle' {
+    import type { LucideIcon } from 'lucide-react';
+    const XCircle: LucideIcon;
+    export default XCircle;
+}
