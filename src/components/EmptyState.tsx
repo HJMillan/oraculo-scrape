@@ -4,7 +4,7 @@ interface EmptyStateProps {
     onRefresh: () => void;
 }
 
-export function EmptyState({ onRefresh }: EmptyStateProps) {
+export function EmptyState({ onRefresh }: Readonly<EmptyStateProps>) {
     return (
         <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-700 rounded-2xl text-gray-400 w-full gap-4">
             <div className="p-4 bg-pink-500/10 rounded-full border border-pink-500/10">

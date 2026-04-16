@@ -252,8 +252,8 @@ const SWIPE_HINT_KEY = "oraculo_swipe_hint_seen";
 function SwipeHintBanner() {
   const [visible, setVisible] = useState(() => {
     // Only show on touch devices that haven't seen it
-    if (typeof window === "undefined") return false;
-    if (!("ontouchstart" in window)) return false;
+    if (globalThis.window === undefined) return false;
+    if (!("ontouchstart" in globalThis)) return false;
     return !localStorage.getItem(SWIPE_HINT_KEY);
   });
 
@@ -274,15 +274,16 @@ function SwipeHintBanner() {
   if (!visible) return null;
 
   return (
-    <div
+    <button
+      type="button"
       onClick={dismiss}
       onTouchStart={dismiss}
-      className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[11px] font-bold tracking-wide cursor-pointer animate-swipe-hint select-none"
+      className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[11px] font-bold tracking-wide cursor-pointer animate-swipe-hint select-none"
     >
       <span>←</span>
       <span>Deslizá para marcar</span>
       <span>→</span>
-    </div>
+    </button>
   );
 }
 

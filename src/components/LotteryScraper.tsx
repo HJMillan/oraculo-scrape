@@ -209,10 +209,9 @@ export function LotteryScraper() {
       )}
 
       {sections.length > 0 ? (
-        <div
-          role="list"
+        <ul
           aria-label="Secciones de sorteo"
-          className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-start animate-in fade-in slide-in-from-bottom-4 duration-500"
+          className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-start animate-in fade-in slide-in-from-bottom-4 duration-500 list-none p-0 m-0"
         >
           {sections.map((section, idx) => (
             <LotteryCard
@@ -226,7 +225,7 @@ export function LotteryScraper() {
               isFirst={idx === 0}
             />
           ))}
-        </div>
+        </ul>
       ) : (
         !loading && <EmptyState onRefresh={refresh} />
       )}

@@ -79,6 +79,12 @@ declare module 'lucide-react/dist/esm/icons/alert-triangle' {
     export default AlertTriangle;
 }
 
+declare module 'lucide-react/dist/esm/icons/x' {
+    import type { LucideIcon } from 'lucide-react';
+    const X: LucideIcon;
+    export default X;
+}
+
 declare module 'lucide-react/dist/esm/icons/x-circle' {
     import type { LucideIcon } from 'lucide-react';
     const XCircle: LucideIcon;
