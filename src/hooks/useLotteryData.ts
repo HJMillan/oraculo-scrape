@@ -7,6 +7,7 @@ export interface UseLotteryDataReturn {
     error: string | null;
     lastUpdated: string | null;
     refresh: () => Promise<void>;
+    clearError: () => void;
 }
 
 // ─── Type Guards ───
@@ -151,5 +152,7 @@ export function useLotteryData(): UseLotteryDataReturn {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    return { sections, loading, error, lastUpdated, refresh };
+    const clearError = useCallback(() => setError(null), []);
+
+    return { sections, loading, error, lastUpdated, refresh, clearError };
 }

@@ -21,8 +21,15 @@ export function generateSectionText(
     lastUpdated: string | null,
     statusMap: Record<string, ItemStatus>,
 ): string {
+    const hour = SECTION_HOURS[section.title];
+    let text = '';
+
+    if (hour) {
+        text += `*AGREGUE ${hour}*\n\n\n`;
+    }
+
     const textTitle = `RESULTADOS DE LAS ${section.title}`;
-    let text = `*${textTitle}*\n${section.date || lastUpdated || 'Hoy'}\n\n`;
+    text += `*${textTitle}*\n${section.date || lastUpdated || 'Hoy'}\n\n`;
 
     section.items.forEach(item => {
         const key = `${section.title}::${item.name}`;
@@ -31,11 +38,6 @@ export function generateSectionText(
         const displayName = item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase();
         text += `${displayName} → ${item.value}${statusLabel}\n`;
     });
-
-    const hour = SECTION_HOURS[section.title];
-    if (hour) {
-        text += `\n*AGREGUE ${hour}*\n`;
-    }
 
     return text;
 }

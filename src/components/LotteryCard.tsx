@@ -1,5 +1,6 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import Copy from "lucide-react/dist/esm/icons/copy";
+import Check from "lucide-react/dist/esm/icons/check";
 import MessageCircle from "lucide-react/dist/esm/icons/message-circle";
 import RotateCcw from "lucide-react/dist/esm/icons/rotate-ccw";
 import type { LotterySection, ItemStatus } from "../types/lottery";
@@ -14,6 +15,8 @@ interface LotteryCardProps {
   onStatusChange: (itemKey: string, status: ItemStatus) => void;
   onResetSection: (sectionTitle: string, itemNames: string[]) => void;
   onToast: (message: string, type?: "success" | "warning" | "error") => void;
+  /** Whether this is the first card — used for swipe hint */
+  isFirst?: boolean;
 }
 
 /** Generates a unique key for an item within its section */
@@ -42,11 +45,22 @@ export function LotteryCard({
   onStatusChange,
   onResetSection,
   onToast,
+  isFirst = false,
 }: Readonly<LotteryCardProps>) {
+  const [copied, setCopied] = useState(false);
+
+  // Auto-revert copied state
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
   const handleCopy = useCallback(async () => {
     const text = generateSectionText(section, lastUpdated, statusMap);
     try {
       await navigator.clipboard.writeText(text);
+      setCopied(true);
       onToast(`✓ Copiado: ${section.title}`, "success");
     } catch {
       onToast(
@@ -73,13 +87,8 @@ export function LotteryCard({
 
   const handleReset = useCallback(() => {
     const names = section.items.map((item) => item.name);
-    const hasAnyStatus = names.some(
-      (name) => statusMap[itemKey(section.title, name)] != null,
-    );
-    if (!hasAnyStatus) return;
     onResetSection(section.title, names);
-    onToast(`✓ Estados limpiados: ${section.title}`, "success");
-  }, [section, statusMap, onResetSection, onToast]);
+  }, [section, onResetSection]);
 
   return (
     <li
@@ -98,6 +107,8 @@ export function LotteryCard({
 
       {/* Body — Semantic definition list */}
       <dl className="bg-surface-card-body p-2 flex flex-col gap-1 grow">
+        {/* Swipe hint — one-shot for first card on touch devices */}
+        {isFirst && <SwipeHintBanner />}
         {section.items.map((item, index) => {
           const key = itemKey(section.title, item.name);
           return (
@@ -113,7 +124,7 @@ export function LotteryCard({
               </dt>
               {/* Value */}
               <dd className="m-0 text-center md:text-right">
-                <span className="text-xl font-black text-gray-100 tracking-tighter tabular-nums">
+                <span className="text-2xl sm:text-xl font-black text-white tracking-tighter tabular-nums font-mono-nums drop-shadow-[0_0_6px_rgba(236,72,153,0.12)]">
                   {item.value}
                 </span>
               </dd>
@@ -134,25 +145,29 @@ export function LotteryCard({
         <button
           onClick={handleCopy}
           aria-label={`Copiar resultados de ${section.title}`}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-white/5 hover:bg-white/10 active:scale-95 text-gray-300 hover:text-white transition-all text-[10px] font-bold uppercase tracking-wide focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 sm:py-1.5 rounded bg-white/5 hover:bg-white/10 active:scale-95 text-gray-300 hover:text-white transition-all text-xs sm:text-[10px] font-bold uppercase tracking-wide focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
         >
-          <Copy className="w-3 h-3" aria-hidden="true" />
-          Copiar
+          {copied ? (
+            <Check className="w-4 h-4 sm:w-3 sm:h-3 text-green-400" aria-hidden="true" />
+          ) : (
+            <Copy className="w-4 h-4 sm:w-3 sm:h-3" aria-hidden="true" />
+          )}
+          {copied ? "Copiado" : "Copiar"}
         </button>
         <button
           onClick={handleReset}
           aria-label={`Limpiar estados de ${section.title}`}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-white/5 hover:bg-white/10 active:scale-95 text-gray-300 hover:text-white transition-all text-[10px] font-bold uppercase tracking-wide focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 sm:py-1.5 rounded bg-white/5 hover:bg-white/10 active:scale-95 text-gray-300 hover:text-white transition-all text-xs sm:text-[10px] font-bold uppercase tracking-wide focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
         >
-          <RotateCcw className="w-3 h-3" aria-hidden="true" />
+          <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3" aria-hidden="true" />
           Limpiar
         </button>
         <button
           onClick={handleWhatsApp}
           aria-label={`Enviar resultados de ${section.title} por WhatsApp`}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-green-500/10 hover:bg-green-500/20 active:scale-95 text-green-500 hover:text-green-400 transition-all text-[10px] font-bold uppercase tracking-wide border border-green-500/10 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 sm:py-1.5 rounded bg-green-500/10 hover:bg-green-500/20 active:scale-95 text-green-500 hover:text-green-400 transition-all text-xs sm:text-[10px] font-bold uppercase tracking-wide border border-green-500/10 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-card-footer outline-none"
         >
-          <MessageCircle className="w-3 h-3" aria-hidden="true" />
+          <MessageCircle className="w-4 h-4 sm:w-3 sm:h-3" aria-hidden="true" />
           Enviar
         </button>
       </div>
@@ -229,3 +244,45 @@ function SwipeableItem({
     </div>
   );
 }
+
+// ─── Swipe Hint Banner (one-shot) ───
+
+const SWIPE_HINT_KEY = "oraculo_swipe_hint_seen";
+
+function SwipeHintBanner() {
+  const [visible, setVisible] = useState(() => {
+    // Only show on touch devices that haven't seen it
+    if (typeof window === "undefined") return false;
+    if (!("ontouchstart" in window)) return false;
+    return !localStorage.getItem(SWIPE_HINT_KEY);
+  });
+
+  useEffect(() => {
+    if (!visible) return;
+    const timer = setTimeout(() => {
+      setVisible(false);
+      localStorage.setItem(SWIPE_HINT_KEY, "1");
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [visible]);
+
+  const dismiss = useCallback(() => {
+    setVisible(false);
+    localStorage.setItem(SWIPE_HINT_KEY, "1");
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div
+      onClick={dismiss}
+      onTouchStart={dismiss}
+      className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[11px] font-bold tracking-wide cursor-pointer animate-swipe-hint select-none"
+    >
+      <span>←</span>
+      <span>Deslizá para marcar</span>
+      <span>→</span>
+    </div>
+  );
+}
+

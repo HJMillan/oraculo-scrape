@@ -1,6 +1,7 @@
 import RefreshCw from 'lucide-react/dist/esm/icons/refresh-cw';
 import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
 import BarChart3 from 'lucide-react/dist/esm/icons/bar-chart-3';
+import { cn } from '../utils/cn';
 
 interface LotteryHeaderProps {
     loading: boolean;
@@ -8,16 +9,16 @@ interface LotteryHeaderProps {
     onRefresh: () => void;
 }
 
-export function LotteryHeader({ loading, lastUpdated, onRefresh }: LotteryHeaderProps) {
+export function LotteryHeader({ loading, lastUpdated, onRefresh }: Readonly<LotteryHeaderProps>) {
     return (
         <header className="flex flex-row justify-between items-center w-full pb-4 border-b border-white/5 gap-4">
             {/* Logo / Título */}
             <div className="flex items-center gap-3">
-                <div className="p-3 bg-gradient-to-br from-pink-500/20 to-purple-600/20 rounded-xl border border-pink-500/20">
+                <div className="p-3 bg-linear-to-br from-pink-500/20 to-purple-600/20 rounded-xl border border-pink-500/20">
                     <BarChart3 className="w-8 h-8 text-pink-500" aria-hidden="true" />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 tracking-tighter drop-shadow-sm leading-none">
+                    <h1 className="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-pink-500 to-purple-500 tracking-tighter drop-shadow-sm leading-none">
                         ORÁCULO
                     </h1>
                     <p className="text-gray-300 text-[10px] tracking-[0.3em] font-medium uppercase mt-1">
@@ -47,8 +48,11 @@ export function LotteryHeader({ loading, lastUpdated, onRefresh }: LotteryHeader
                     )}
                 </button>
 
-                {lastUpdated && !loading && (
-                    <p className="text-[10px] font-semibold text-gray-400 tracking-wider uppercase">
+                {lastUpdated && (
+                    <p className={cn(
+                        "text-[10px] font-semibold text-gray-400 tracking-wider uppercase",
+                        loading && "opacity-40"
+                    )}>
                         Última: <span className="text-pink-400">{lastUpdated}</span>
                     </p>
                 )}

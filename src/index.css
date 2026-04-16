@@ -12,6 +12,7 @@
 
 :root {
   font-family:
+    'Inter',
     system-ui,
     -apple-system,
     "Segoe UI",
@@ -28,6 +29,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Monospace numerals for lottery values */
+.font-mono-nums {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 body {
@@ -56,4 +62,20 @@ body {
 }
 .animate-status-bounce {
   animation: status-bounce 200ms ease-out;
+}
+
+/* Swipe hint animation — gentle left-right nudge */
+@keyframes swipe-hint {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+.animate-swipe-hint {
+  animation: swipe-hint 1.5s ease-in-out 2;
 }

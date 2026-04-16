@@ -1,4 +1,4 @@
-const SKELETON_ROWS = 5;
+const SKELETON_ROWS = 10;
 
 export function SkeletonCard() {
   return (
@@ -33,10 +33,11 @@ export function SkeletonCard() {
         ))}
       </div>
 
-      {/* Footer skeleton */}
+      {/* Footer skeleton — 3 buttons matching real card */}
       <div className="bg-surface-card-footer p-2 flex gap-2 border-t border-white/5">
         <div className="flex-1 h-8 bg-white/5 rounded animate-pulse" />
         <div className="flex-1 h-8 bg-white/5 rounded animate-pulse" />
+        <div className="flex-1 h-8 bg-white/5 rounded animate-pulse border border-green-500/5" />
       </div>
     </div>
   );
