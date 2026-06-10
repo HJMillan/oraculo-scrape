@@ -7,7 +7,7 @@ export const KNOWN_GIF_HASHES: Record<string, string> = {
     '8e0ebcbefac2c7ccb84860b646bf77dd': 'la Perla',
 };
 
-const GIF_BASE_URL = 'https://pob.my.canva.site/oraculo/';
+const GIF_BASE_URL = 'https://pob.my.canva.site/nuevo-cabecero/';
 const GIF_PATH_PREFIX = '_assets/video/';
 const GIF_EXTENSION = '.gif';
 
