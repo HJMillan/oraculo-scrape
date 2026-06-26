@@ -2,7 +2,7 @@
 // Uses native fetch (no external dependencies).
 
 try {
-    const res = await fetch('https://pob.my.canva.site/nuevo-cabecero');
+    const res = await fetch('https://pob.my.canva.site/placa');
     const html = await res.text();
 
     const bootstrapRegex = /window\['bootstrap'\]\s*=\s*JSON\.parse\('(.+?)'\);/;

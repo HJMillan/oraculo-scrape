@@ -3,7 +3,7 @@ import { fetchAndParseCanvaData, validateAndExtractPages } from './canva-parser.
 import { buildGifAssetMap } from './gif-asset-mapper.js';
 import { extractSectionsFromPages } from './element-extractor.js';
 
-const TARGET_URL = 'https://pob.my.canva.site/nuevo-cabecero';
+const TARGET_URL = 'https://pob.my.canva.site/placa';
 
 /**
  * Framework-agnostic scraping service.
