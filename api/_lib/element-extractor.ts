@@ -7,6 +7,9 @@ const MAX_Y_DISTANCE = 300;
 const Y_SORT_THRESHOLD = 10;
 const GIF_X_THRESHOLD = 60;
 
+/** Valor mostrado cuando la placa aún no publicó los números */
+const PENDING_VALUE = '--';
+
 const SECTION_TITLES = [
     'LA PREVIA', 'LAS PRIMERAS', 'MATUTINA', 'VESPERTINA', 'NOCTURNA',
     'LAS NOCTURNAS', 'LAS VESPERTINAS', 'LAS MATUTINAS',
@@ -25,6 +28,21 @@ function normalizeTitle(text: string): string | null {
     if (upper.includes('VESPERTINA')) return 'VESPERTINA';
     if (upper.includes('NOCTURNA')) return 'NOCTURNA';
     return null;
+}
+
+/**
+ * Fecha de hoy en dd/mm/aaaa y hora de Argentina.
+ * Se usa cuando la placa no trae "Fecha:" — como la nocturna sin resultados.
+ * El servidor de Vercel corre en UTC, donde después de las 21hs ART ya es el
+ * día siguiente, así que la zona horaria se fija de forma explícita.
+ */
+function todayInArgentina(): string {
+    return new Intl.DateTimeFormat('es-AR', {
+        timeZone: 'America/Argentina/Buenos_Aires',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    }).format(new Date());
 }
 
 // ─── Page processing ───
@@ -89,7 +107,7 @@ export function extractSectionsFromPages(
             if (sectionItems.length > 0) {
                 sections.push({
                     title: pageTitle,
-                    date: pageDate || new Date().toLocaleDateString('es-AR'),
+                    date: pageDate || todayInArgentina(),
                     items: sectionItems,
                 });
             }
@@ -124,6 +142,22 @@ function extractPairs(items: ScrapedItem[], gifs: GifElement[]): LotteryItem[] {
         } else if (!isDate && item.text.length <= 30 && textUpper.length >= 2) {
             headers.push(item);
         }
+    }
+
+    // ── Placa publicada sin resultados: hay encabezados pero ningún valor ──
+    // El Canva solía traer '--' como placeholder; cuando no incluye las cajas
+    // de números los generamos acá para no ocultar la sección entera.
+    if (values.length === 0) {
+        return [...headers]
+            .sort((a, b) => {
+                const yDiff = a.y - b.y;
+                if (Math.abs(yDiff) > Y_SORT_THRESHOLD) return yDiff;
+                return a.x - b.x;
+            })
+            .map(header => ({
+                name: header.text.replace(/\n/g, '').trim(),
+                value: PENDING_VALUE,
+            }));
     }
 
     // ── GIF-first matching: each GIF finds its closest value by X coordinate ──
