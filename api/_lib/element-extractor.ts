@@ -1,4 +1,4 @@
-import type { CanvaPage, ScrapedItem, GifElement, LotteryItem, LotterySection } from './types.js';
+import type { CanvaElement, CanvaPage, ScrapedItem, GifElement, LotteryItem, LotterySection } from './types.js';
 
 // ─── Constants ───
 
@@ -45,6 +45,31 @@ function todayInArgentina(): string {
     }).format(new Date());
 }
 
+// ─── Text reading ───
+
+/**
+ * Devuelve el texto de un elemento de Canva.
+ *
+ * Canva guarda el contenido en dos formas según con qué editor se creó la
+ * caja: segmentos con estilo en `a.A` (objetos con `.A`), o strings planos en
+ * `a.C.A`. Una misma página puede mezclar ambas — la placa nocturna usa la
+ * segunda para los números y la fecha, y la primera para los encabezados.
+ */
+function readElementText(el: CanvaElement): string {
+    const segments = el.a?.A;
+    if (Array.isArray(segments) && segments.length > 0) {
+        const text = segments.map(s => s?.A || '').join('').trim();
+        if (text) return text;
+    }
+
+    const plain = el.a?.C?.A;
+    if (Array.isArray(plain) && plain.length > 0) {
+        return plain.filter(s => typeof s === 'string').join('').trim();
+    }
+
+    return '';
+}
+
 // ─── Page processing ───
 
 /**
@@ -77,28 +102,23 @@ export function extractSectionsFromPages(
             }
 
             // ── Process text elements ──
-            if (el.a?.A && Array.isArray(el.a.A)) {
-                const textContent = el.a.A
-                    .map(segment => segment.A || '')
-                    .join('')
-                    .trim();
+            const textContent = readElementText(el);
 
-                if (textContent && typeof el.A === 'number' && typeof el.B === 'number') {
-                    const inferredTitle = normalizeTitle(textContent);
-                    if (inferredTitle) pageTitle = inferredTitle;
+            if (textContent && typeof el.A === 'number' && typeof el.B === 'number') {
+                const inferredTitle = normalizeTitle(textContent);
+                if (inferredTitle) pageTitle = inferredTitle;
 
-                    const dateMatch = textContent.match(/(\d{2}\/\d{2}\/\d{4})/);
-                    if (dateMatch) pageDate = dateMatch[1];
+                const dateMatch = textContent.match(/(\d{2}\/\d{2}\/\d{4})/);
+                if (dateMatch) pageDate = dateMatch[1];
 
-                    pageItems.push({
-                        text: textContent,
-                        x: el.A,
-                        y: el.B,
-                        width: el.D || 0,
-                        centerX: el.A + ((el.D || 0) / 2),
-                        centerY: el.B + ((el.C || 0) / 2),
-                    });
-                }
+                pageItems.push({
+                    text: textContent,
+                    x: el.A,
+                    y: el.B,
+                    width: el.D || 0,
+                    centerX: el.A + ((el.D || 0) / 2),
+                    centerY: el.B + ((el.C || 0) / 2),
+                });
             }
         }
 

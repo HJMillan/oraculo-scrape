@@ -34,6 +34,7 @@ export interface CanvaElement {
     C: number;   // Height
     a?: {
         A?: Array<{ A?: string }>;
+        C?: { A?: string[] };     // Texto plano (cajas del editor nuevo)
         I?: { A?: string };       // Asset/media ID reference
     };
 }
